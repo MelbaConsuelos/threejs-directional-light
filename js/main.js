@@ -5,7 +5,7 @@ import * as dat from "/js/jsm/libs/dat.gui.module.js";
 
 "use strict";
 
-let renderer, scene, camera, box, cameraControls, gui, stats;
+let renderer, scene, camera, mesh, cameraControls, gui, stats, directionalLight;
 window.anim = false;
 
 function init(event) {
@@ -26,20 +26,34 @@ function init(event) {
     camera = new THREE.PerspectiveCamera(fovy, aspectRatio, nearPlane, farPlane);
     camera.position.set(2, 2, 5);
     cameraControls = new OrbitControls(camera, renderer.domElement);
+
+    // LIGHT
+    let lightColor = "#f9f9f9";
+    let lightIntensity = 2;
+    directionalLight = new THREE.DirectionalLight( lightColor, lightIntensity );
+    directionalLight.position.set(2, 5, 6);
+    directionalLight.target.position.set(0, 3, 0);
+    console.log(directionalLight);
+
             
     // MODEL
     // BOX
-    let geometry = new THREE.BoxGeometry(1);
-    let material = new THREE.MeshBasicMaterial({color: "red"});
-    box = new THREE.Mesh(geometry, material);
-    box.position.set(0, 0.5, 0);
+    const cubeSize = 3;
+    const cubeGeo = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    const cubeMat = new THREE.MeshPhongMaterial({color: '#8AC'});
+    mesh = new THREE.Mesh(cubeGeo, cubeMat);
+    mesh.position.set(0, 0.5, 0);
+    
 
     // FLOOR
     let floor = new Floor();
 
     // SCENE HIERARCHY
-    scene.add(box);
+    scene.add(mesh);
     scene.add(floor);
+    scene.add(directionalLight);
+    scene.add(directionalLight.target);
+
 
     // GUI
     gui = new dat.GUI();
@@ -50,6 +64,12 @@ function init(event) {
     gui.add(window, "anim").name("Animation").listen().onChange(function(value) {
 
     });
+
+    gui.addColor(new ColorGUIHelper(directionalLight, 'color'), 'value').name('color');
+    gui.add(directionalLight, 'intensity', 0, 2, 0.01);
+    gui.add(directionalLight.target.position, 'x', -10, 10);
+    gui.add(directionalLight.target.position, 'z', -10, 10);
+    gui.add(directionalLight.target.position, 'y', 0, 10);
     gui.open();
 
     // SETUP STATS
@@ -72,8 +92,8 @@ function renderLoop() {
 
 function updateScene() {
     if(anim) {
-        box.rotation.x = box.rotation.x + 0.01;
-        box.rotation.y = box.rotation.y + 0.01;
+        mesh.rotation.x = mesh.rotation.x + 0.01;
+        mesh.rotation.y = mesh.rotation.y + 0.01;
     }
 }
 
@@ -101,5 +121,18 @@ class Floor extends THREE.Mesh {
         this.visible = false;
     }
 }
+
+class ColorGUIHelper {
+    constructor(object, prop) {
+      this.object = object;
+      this.prop = prop;
+    }
+    get value() {
+      return `#${this.object[this.prop].getHexString()}`;
+    }
+    set value(hexString) {
+      this.object[this.prop].set(hexString);
+    }
+  }
 
 
