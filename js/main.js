@@ -1,3 +1,8 @@
+/*
+* Melba Consuelos A01410921
+* Paola Villarreal A00821971
+* Natalia González A01382007
+*/
 import * as THREE from "/build/three.module.js";
 import Stats from "/js/jsm/libs/stats.module.js";
 import { OrbitControls } from "/js/jsm/controls/OrbitControls.js";
@@ -35,8 +40,7 @@ function init(event) {
     directionalLight.target.position.set(0, 3, 0);
     let directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight);
 
-    // MODEL
-    // BOX
+    // MODEL - BOX
     let geometry = new THREE.BoxGeometry(1);
     let material = new THREE.MeshPhongMaterial({ color: '#8AC' });
     box = new THREE.Mesh(geometry, material);
@@ -59,14 +63,16 @@ function init(event) {
     gui.add(floor, "visible").name("Floor").setValue(false).listen().onChange(function (value) {
 
     });
+
+    // START/STOP ANIMATION
     gui.add(window, "anim").name("Animation").listen().onChange(function (value) {
 
     });
 
+    // SLIDERS
     gui.add(directionalLight, "intensity").min(0).max(2).step(0.01).setValue(2).name("Intensity").listen().onChange(function (value) {
 
     });
-
     gui.add(directionalLight.target.position, "x").min(-10).max(10).step(1).setValue(0).name("Target X").listen().onChange(function (value) {
         directionalLightHelper.update();
     });
@@ -77,6 +83,7 @@ function init(event) {
         directionalLightHelper.update();
     });
 
+    // COLORS
     let params = {
         boxColor: new THREE.Color(1, 1, 1),
         directionalLightColor: new THREE.Color(1, 1, 1)
